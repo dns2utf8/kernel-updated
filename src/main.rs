@@ -1,5 +1,7 @@
 extern crate notify_rust;
 use std::process::Command;
+use std::time::Duration;
+use std::thread::sleep;
 
 use notify_rust::Notification;
 
@@ -17,6 +19,16 @@ fn parse_uname_output(uname_output: &str) -> Option<&str> {
 }
 
 fn main() {
+    // Every 10 minutes
+    let check_interval = Duration::from_secs(600);
+
+    loop {
+        check_system();
+        sleep(check_interval);
+    }
+}
+
+fn check_system() {
     let output_pacman = Command::new("pacman")
         .arg("-Q")
         .arg("linux")
@@ -39,13 +51,12 @@ fn main() {
     println!("installed: {}", output_pacman);
     println!("running:   {}", output_uname);
 
-    let should_reboot = output_pacman != output_uname;
 
-    if should_reboot {
+    if output_pacman != output_uname {
         println!("You should reboot your system!");
         Notification::new()
             .summary("Reboot needed")
-            .body("Kernel got updated! You should reboot your system!")
+            .body("Kernel was updated! You should reboot your system!")
             .timeout(6000) //milliseconds
             .show().unwrap();
     }
