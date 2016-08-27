@@ -57,7 +57,7 @@ fn check_system() {
         Notification::new()
             .summary("Reboot needed")
             .body("Kernel was updated! You should reboot your system!")
-            .timeout(6000) //milliseconds
+            .timeout(0) //milliseconds
             .show().unwrap();
     }
 }
